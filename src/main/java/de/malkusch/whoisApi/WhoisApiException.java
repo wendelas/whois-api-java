@@ -6,7 +6,7 @@ import javax.annotation.concurrent.Immutable;
  * A Whois API exception.
  *
  * @author markus@malkusch.de
- * @see https://market.mashape.com/malkusch/whois
+ * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>
  */
 @Immutable
 public class WhoisApiException extends RuntimeException {

@@ -32,7 +32,7 @@ import com.mashape.unirest.request.HttpRequest;
  * }
  *
  * @author markus@malkusch.de
- * @see https://market.mashape.com/malkusch/whois
+ * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>
  */
 @ThreadSafe
 public class WhoisApi {

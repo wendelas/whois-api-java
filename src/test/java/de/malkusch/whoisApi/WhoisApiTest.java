@@ -6,7 +6,7 @@ import org.junit.Test;
  * A test for WhoisApi.
  * 
  * @author markus@malkusch.de
- * @see https://market.mashape.com/malkusch/whois
+ * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>
  */
 public class WhoisApiTest {
 
