@@ -3,6 +3,10 @@ sudo: false
 language: java
 jdk: oraclejdk8
 
+env:
+  global:
+    - secure: "bNMxHt0tk43aYSrsvHDVAucEMkm+tXhfGNYSjNsZQd0Xks381rl29ACqxAz+vn8ndR5d6DavePVqTKpoR7tss7VoN0pia7PsHpe9LHKxI6PYMFpbzTFf7zE9Mlf7b+xSpFVBfMwo3oXDbIyXPatEoLbP/cTfx8dHZWoMtukUPcwEXQUd+SbhefjrsDTsLpNgOac3qlzEmJ02X11XVQihxAGRZsguRDJgxoEiS8yJZPAiALY37lbh9UJ1jspUQx8SXZdUMOVWzAAkyG6gVX9Z64L7MK26nKFKjE+AaR0tlRh/I64/pm4Hrcr2Jo6kf76URx/V4u+gI963aUy3P9DSQnM+CBy0DqUfUZEBV8L9okklWjUD47Mn2ZjX5+uFkiKPHMJWmNIP1xDOrCckABbzEGkYqMK4a70SHg93jY6TUbXTaPmcbrrmsv0jlNMqgvuhs8ZMJnWHGn/6OTF5wxkjNAq1WETMedS7LcPqBv3dW6d2jAJ585YHuiyruaHBlaE6ub4aXpEOsyfnqm+NHgrWl7QVyiOWSuyXOjMjIIf72KSafeltB7rF/iU9j/IlQ1iPx7zWRv0+OFOLwS6q8WIohTOkgHwVv96o8XyqJtJzaPTdqQ1+1h48ilRXg1hmk3Of8AkKXQ9mJDSrXdfazlw51KmZj2raskTPAYh1Hp18vP4="
+
 cache:
   directories:
     - '$HOME/.m2/repository'
