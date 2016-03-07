@@ -18,18 +18,21 @@ import com.mashape.unirest.request.HttpRequest;
 /**
  * A Whois API.
  *
- * This is a client library for the service of
- * https://market.mashape.com/malkusch/whois. Register there to get an API key.
+ * This is a client library for the
+ * <a href="https://market.mashape.com/malkusch/whois">Whois API service</a>. Register there to get an API key.
  *
  * With this API you can check if a domain name is available, get its whois data
- * or query an arbitrary whois server. The service is using the whois list from
- * https://github.com/whois-server-list/whois-server-list. Also it avoids
- * hitting any rate limits on the whois servers.
- *
- * Example: {@code
+ * or query an arbitrary whois server. The service is using this
+ * <a href="https://github.com/whois-server-list/whois-server-list">Whois server list</a>.
+ * Also it avoids hitting any rate limits on the whois servers.
+ * <p>
+ * Example:
+ * <pre>
+ * {@code
  * WhoisApi whoisApi = new WhoisApi("apiKey);
  * System.out.println(whoisApi.isAvailable("example.net") ? "available" : "registered");
  * }
+ * </pre>
  *
  * @author markus@malkusch.de
  * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>

@@ -19,7 +19,7 @@ This package is available in Maven central:
 <dependency>
     <groupId>de.malkusch.whois-server-list</groupId>
     <artifactId>whois-api</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -33,10 +33,14 @@ to the [Whois API](https://market.mashape.com/malkusch/whois).
 WhoisApi whoisApi = new WhoisApi("apiKey");
 ```
 
-- `WhoisApi.isAvailable(String)` checks if a domain name is available.
-- `WhoisApi.whois(String)` returns the whois data of a domain.
-- `WhoisApi.query(String, String)` queries an arbitrary whois server.
-- `WhoisApi.domains()` lists all top and second level domains which can be used by the Whois API.
+- [`WhoisApi.isAvailable(String)`](http://whois-server-list.github.io/whois-api-java/apidocs/de/malkusch/whoisApi/WhoisApi.html#isAvailable-java.lang.String-)
+    checks if a domain name is available.
+- [`WhoisApi.whois(String)`](http://whois-server-list.github.io/whois-api-java/apidocs/de/malkusch/whoisApi/WhoisApi.html#whois-java.lang.String-)
+    returns the whois data of a domain.
+- [`WhoisApi.query(String, String)`](http://whois-server-list.github.io/whois-api-java/apidocs/de/malkusch/whoisApi/WhoisApi.html#query-java.lang.String-java.lang.String-)
+    queries an arbitrary whois server.
+- [`WhoisApi.domains()`](http://whois-server-list.github.io/whois-api-java/apidocs/de/malkusch/whoisApi/WhoisApi.html#domains--)
+    lists all top and second level domains which can be used by the Whois API.
 
 ## Example
 
