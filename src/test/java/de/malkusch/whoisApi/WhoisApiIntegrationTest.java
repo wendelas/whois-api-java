@@ -17,7 +17,7 @@ import org.junit.Test;
  * Please provide the environment variable API_KEY.
  * 
  * @author markus@malkusch.de
- * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>
+ * @see <a href="http://whois-api.domaininformation.de/">Whois API</a>
  */
 public class WhoisApiIntegrationTest {
 

@@ -19,7 +19,7 @@ import com.mashape.unirest.request.HttpRequest;
  * A Whois API.
  *
  * This is a client library for the
- * <a href="https://market.mashape.com/malkusch/whois">Whois API service</a>. Register there to get an API key.
+ * <a href="http://whois-api.domaininformation.de/">Whois API service</a>. Register there to get an API key.
  *
  * With this API you can check if a domain name is available, get its whois data
  * or query an arbitrary whois server. The service is using this
@@ -35,7 +35,7 @@ import com.mashape.unirest.request.HttpRequest;
  * </pre>
  *
  * @author markus@malkusch.de
- * @see <a href="https://market.mashape.com/malkusch/whois">Whois API</a>
+ * @see <a href="http://whois-api.domaininformation.de/">Whois API</a>
  */
 @ThreadSafe
 public class WhoisApi {
@@ -51,7 +51,7 @@ public class WhoisApi {
     /**
      * Builds the Whois API client.
      * 
-     * Register at https://market.mashape.com/malkusch/whois to get an API key.
+     * Register at http://whois-api.domaininformation.de/ to get an API key.
      * 
      * @param apiKey
      *            api key
@@ -63,7 +63,7 @@ public class WhoisApi {
     /**
      * Builds the Whois API client.
      * 
-     * Register at https://market.mashape.com/malkusch/whois to get an API key.
+     * Register at http://whois-api.domaininformation.de/ to get an API key.
      * 
      * @param apiKey
      *            api key
