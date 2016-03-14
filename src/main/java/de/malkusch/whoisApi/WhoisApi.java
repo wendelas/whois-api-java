@@ -9,6 +9,7 @@ import java.util.Scanner;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -19,14 +20,16 @@ import com.mashape.unirest.request.HttpRequest;
  * A Whois API.
  *
  * This is a client library for the
- * <a href="http://whois-api.domaininformation.de/">Whois API service</a>. Register there to get an API key.
+ * <a href="http://whois-api.domaininformation.de/">Whois API service</a>.
+ * Register there to get an API key.
  *
  * With this API you can check if a domain name is available, get its whois data
  * or query an arbitrary whois server. The service is using this
- * <a href="https://github.com/whois-server-list/whois-server-list">Whois server list</a>.
- * Also it avoids hitting any rate limits on the whois servers.
+ * <a href="https://github.com/whois-server-list/whois-server-list">Whois server
+ * list</a>. Also it avoids hitting any rate limits on the whois servers.
  * <p>
  * Example:
+ * 
  * <pre>
  * {@code
  * WhoisApi whoisApi = new WhoisApi("apiKey);
@@ -83,6 +86,34 @@ public class WhoisApi {
     }
 
     /**
+     * Checks if a domain is available and returns the whois response.
+     * 
+     * @param domain
+     *            domain name, e.g. "example.net"
+     * @return the combined domain check and the whois response
+     *
+     * @throws WhoisApiException
+     *             if the api request caused an error
+     * @throws RecoverableWhoisApiException
+     *             if the API failed, but you can try again.
+     */
+    public CheckResult check(final String domain) throws RecoverableWhoisApiException {
+        if (domain == null) {
+            throw new NullPointerException();
+        }
+        if (domain.isEmpty()) {
+            throw new IllegalArgumentException("Domain is empty.");
+        }
+
+        String uri = baseUri.toString() + "/check?domain={domain}";
+        HttpRequest request = Unirest.get(uri).routeParam("domain", domain);
+
+        JSONObject response = sendRequest(request, request::asJson).getObject();
+        CheckResult result = new CheckResult(response.getBoolean("available"), response.getString("whoisResponse"));
+        return result;
+    }
+
+    /**
      * Checks if a domain is available.
      * 
      * If a domain is available (i.e. not registered) this method will return
@@ -98,17 +129,7 @@ public class WhoisApi {
      *             if the API failed, but you can try again.
      */
     public boolean isAvailable(final String domain) throws RecoverableWhoisApiException {
-        if (domain == null) {
-            throw new NullPointerException();
-        }
-        if (domain.isEmpty()) {
-            throw new IllegalArgumentException("Domain is empty.");
-        }
-
-        String uri = baseUri.toString() + "/check?domain={domain}";
-        HttpRequest request = Unirest.get(uri).routeParam("domain", domain);
-
-        return sendRequest(request, request::asJson).getObject().getBoolean("available");
+        return check(domain).isAvailable();
     }
 
     /**
@@ -124,17 +145,7 @@ public class WhoisApi {
      *             if the API failed, but you can try again.
      */
     public String whois(final String domain) throws RecoverableWhoisApiException {
-        if (domain == null) {
-            throw new NullPointerException();
-        }
-        if (domain.isEmpty()) {
-            throw new IllegalArgumentException("Domain is empty.");
-        }
-
-        String uri = baseUri.toString() + "/check?domain={domain}";
-        HttpRequest request = Unirest.get(uri).routeParam("domain", domain);
-
-        return sendRequest(request, request::asJson).getObject().getString("whoisResponse");
+        return check(domain).whoisResponse();
     }
 
     /**
