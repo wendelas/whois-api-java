@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
@@ -108,8 +109,9 @@ public class WhoisApi {
         String uri = baseUri.toString() + "/check?domain={domain}";
         HttpRequest request = Unirest.get(uri).routeParam("domain", domain);
 
-        JSONObject response = sendRequest(request, request::asJson).getObject();
-        CheckResult result = new CheckResult(response.getBoolean("available"), response.getString("whoisResponse"));
+        String response = sendRequest(request, request::asString);
+        JSONObject json = new JsonNode(response).getObject();
+        CheckResult result = new CheckResult(json.getBoolean("available"), json.getString("whoisResponse"));
         return result;
     }
 
