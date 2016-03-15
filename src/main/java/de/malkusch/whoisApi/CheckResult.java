@@ -1,5 +1,7 @@
 package de.malkusch.whoisApi;
 
+import java.io.Serializable;
+
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -9,7 +11,8 @@ import javax.annotation.concurrent.Immutable;
  * @see <a href="http://whois-api.domaininformation.de/">Whois API</a>
  */
 @Immutable
-public final class CheckResult {
+public final class CheckResult implements Serializable {
+    private static final long serialVersionUID = 2899819100463622412L;
 
     /**
      * True if the domain is available.
