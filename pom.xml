@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.malkusch.whois-server-list</groupId>
 	<artifactId>whois-api</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>0.0.7</version>
 	<name>Whois API</name>
 	<description>Client library for the Whois API of http://whois-api.domaininformation.de/</description>
 
