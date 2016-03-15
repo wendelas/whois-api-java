@@ -69,7 +69,7 @@ public class WhoisApiIntegrationTest {
     }
 
     @Test
-    public void domainsShouldIncludeKnownTLDs() {
+    public void domainsShouldIncludeKnownTLDs() throws RecoverableWhoisApiException {
         assertTrue(api.domains().contains("de"));
         assertTrue(api.domains().contains("com"));
         assertTrue(api.domains().contains("net"));

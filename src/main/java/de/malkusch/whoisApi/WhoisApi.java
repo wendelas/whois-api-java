@@ -1,21 +1,25 @@
 package de.malkusch.whoisApi;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Scanner;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
 
 /**
  * A Whois API.
@@ -47,6 +51,8 @@ public class WhoisApi {
     private final String apiKey;
 
     private final URI baseUri;
+
+    private final HttpClient client;
 
     private static final String DEFAULT_BASE_URI = "https://whois-v0.p.mashape.com/";
 
@@ -84,6 +90,8 @@ public class WhoisApi {
 
         this.apiKey = apiKey;
         this.baseUri = baseUri;
+
+        client = HttpClients.createDefault();
     }
 
     /**
@@ -106,13 +114,22 @@ public class WhoisApi {
             throw new IllegalArgumentException("Domain is empty.");
         }
 
-        String uri = baseUri.toString() + "/check?domain={domain}";
-        HttpRequest request = Unirest.get(uri).routeParam("domain", domain);
+        URI uri;
+        try {
+            uri = URI.create(baseUri.toString() + "/check?domain=" + URLEncoder.encode(domain, "UTF-8"));
 
-        String response = sendRequest(request, request::asString);
-        JSONObject json = new JsonNode(response).getObject();
-        CheckResult result = new CheckResult(json.getBoolean("available"), json.getString("whoisResponse"));
-        return result;
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+
+        try (InputStream response = sendRequest(uri)) {
+            JSONObject json = new JSONObject(IOUtils.toString(response));
+            CheckResult result = new CheckResult(json.getBoolean("available"), json.getString("whoisResponse"));
+            return result;
+
+        } catch (IOException e) {
+            throw new RecoverableWhoisApiException(e);
+        }
     }
 
     /**
@@ -173,10 +190,15 @@ public class WhoisApi {
             throw new IllegalArgumentException("Host and query should not be empty.");
         }
 
-        String uri = baseUri.toString() + "/whois?host={host}&query={query}";
-        HttpRequest request = Unirest.get(uri).routeParam("host", host).routeParam("query", query);
+        try {
+            URI uri = URI.create(baseUri.toString() + "/whois?host=" + URLEncoder.encode(host, "UTF-8") + "&query="
+                    + URLEncoder.encode(query, "UTF-8"));
 
-        return sendRequest(request, request::asBinary);
+            return sendRequest(uri);
+
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -184,65 +206,59 @@ public class WhoisApi {
      * the Whois API.
      *
      * @return all available top and second level domains
+     * @throws RecoverableWhoisApiException
+     *             if the API failed, but you can try again.
      */
-    public Collection<String> domains() {
-        String uri = baseUri.toString() + "/domains";
-        HttpRequest request = Unirest.get(uri);
+    public Collection<String> domains() throws RecoverableWhoisApiException {
+        URI uri = URI.create(baseUri.toString() + "/domains");
+        try (InputStream response = sendRequest(uri)) {
+            JSONArray array = new JSONArray(IOUtils.toString(response));
 
-        JSONArray response;
-        try {
-            response = sendRequest(request, request::asJson).getArray();
+            String[] domains = new String[array.length()];
+            for (int i = 0; i < array.length(); i++) {
+                domains[i] = array.getString(i);
+            }
+            return Arrays.asList(domains);
 
-        } catch (RecoverableWhoisApiException e) {
-            throw new IllegalStateException(e);
-        }
-
-        String[] domains = new String[response.length()];
-        for (int i = 0; i < response.length(); i++) {
-            domains[i] = response.getString(i);
-        }
-        return Arrays.asList(domains);
-    }
-
-    private interface RequestCall<T> {
-
-        HttpResponse<T> call() throws UnirestException;
-
-    }
-
-    private <T> T sendRequest(final HttpRequest request, RequestCall<T> requestCall)
-            throws RecoverableWhoisApiException {
-
-        request.header(API_KEY_HEADER, apiKey);
-
-        HttpResponse<T> response;
-        try {
-            response = requestCall.call();
-
-        } catch (UnirestException e) {
+        } catch (JSONException e) {
             throw new WhoisApiException(e);
-        }
 
-        switch (response.getStatus()) {
-        case 200:
-            return response.getBody();
-
-        case 502:
-        case 504:
-            String message = String.format("Try again (%d): %s", response.getStatus(), convert(response));
-            throw new RecoverableWhoisApiException(message);
-
-        default:
-            String message2 = String.format("API failed (%d): %s", response.getStatus(), convert(response));
-            throw new WhoisApiException(message2);
-
+        } catch (IOException e) {
+            throw new RecoverableWhoisApiException(e);
         }
     }
 
-    private static String convert(final HttpResponse<?> response) {
-        try (Scanner scanner = new Scanner(response.getRawBody())) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+    private InputStream sendRequest(URI uri) throws RecoverableWhoisApiException {
+
+        try {
+            HttpGet get = new HttpGet(uri);
+            get.addHeader(API_KEY_HEADER, apiKey);
+
+            HttpResponse response = client.execute(get);
+            StatusLine statusLine = response.getStatusLine();
+
+            switch (statusLine.getStatusCode()) {
+            case 200:
+                return response.getEntity().getContent();
+
+            case 502:
+            case 504:
+                String message = String.format("Try again (%d): %s", statusLine.getStatusCode(),
+                        statusLine.getReasonPhrase());
+                throw new RecoverableWhoisApiException(message);
+
+            default:
+                String message2 = String.format("API failed (%d): %s", statusLine.getStatusCode(),
+                        statusLine.getReasonPhrase());
+                throw new WhoisApiException(message2);
+
+            }
+
+        } catch (ClientProtocolException e) {
+            throw new WhoisApiException(e);
+
+        } catch (IOException e) {
+            throw new RecoverableWhoisApiException(e);
         }
     }
 
