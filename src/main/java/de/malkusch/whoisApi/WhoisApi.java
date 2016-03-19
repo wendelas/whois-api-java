@@ -1,6 +1,5 @@
 package de.malkusch.whoisApi;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -16,9 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,13 +45,11 @@ import org.json.JSONObject;
  * @see <a href="http://whois-api.domaininformation.de/">Whois API</a>
  */
 @ThreadSafe
-public class WhoisApi implements Closeable {
+public class WhoisApi {
 
     private final String apiKey;
 
     private final URI baseUri;
-
-    private final CloseableHttpClient client;
 
     private static final String DEFAULT_BASE_URI = "https://whois-v0.p.mashape.com/";
 
@@ -92,13 +87,8 @@ public class WhoisApi implements Closeable {
 
         this.apiKey = apiKey;
         this.baseUri = baseUri;
-
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setDefaultMaxPerRoute(100);
-        cm.setMaxTotal(200);
-        client = HttpClients.custom().setConnectionManager(cm).build();
     }
-    
+
     /**
      * Checks if a domain is available and returns the whois response.
      * 
@@ -238,7 +228,7 @@ public class WhoisApi implements Closeable {
             HttpGet get = new HttpGet(uri);
             get.addHeader(API_KEY_HEADER, apiKey);
 
-            HttpResponse response = client.execute(get);
+            HttpResponse response = HttpClients.createDefault().execute(get);
             StatusLine statusLine = response.getStatusLine();
 
             switch (statusLine.getStatusCode()) {
@@ -264,11 +254,6 @@ public class WhoisApi implements Closeable {
         } catch (IOException e) {
             throw new RecoverableWhoisApiException(e);
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        client.close();
     }
 
 }
