@@ -19,7 +19,7 @@ This package is available in Maven central:
 <dependency>
     <groupId>de.malkusch.whois-server-list</groupId>
     <artifactId>whois-api</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.8</version>
 </dependency>
 ```
 
